@@ -148,18 +148,15 @@ public class TetrisActivity extends AppCompatActivity implements SensorEventList
             TextView textView = (TextView) findViewById(R.id.fullscreen_content);
 
 
-            /* sets text to:
-             *  "<" if x axis is greater than 5.0f
-             *  ">" if x axis is lower than -5.0f
-             *  "v" if y axis is greater than 5.0f
-             *  "^" if y axis is lower than -5.0f
-             * if more than one condition is true, sets text according to the highest absolute value
-             * ALWAYS sets text to "." if z axis is greater than 9.0f.
+            /* Sets text to:
+             *  - "<" if x axis is greater than 5.0f
+             *  - ">" if x axis is lower than -5.0f
+             *  - "v" if y axis is greater than 5.0f
+             *  - "^" if y axis is lower than -5.0f
+             * if more than one condition is true, sets text according to the highest absolute
+             * value. Sets text to "." only if none of the previous conditions are true and z axis
+             * is greater than 9.0f.
             */
-            if(event.values[Z_AXIS] > 9.0f) {
-                textView.setText(".");
-                return;
-            }
             int highest = event.values[X_AXIS] > event.values[Y_AXIS] ? X_AXIS : Y_AXIS;
             int lowest = event.values[X_AXIS] < event.values[Y_AXIS] ? X_AXIS : Y_AXIS;
             boolean isHighEnough = event.values[highest] > 5.0f;
@@ -174,6 +171,8 @@ public class TetrisActivity extends AppCompatActivity implements SensorEventList
                 textView.setText(highest == 0 ? "<" : "v");
             else if(isLowEnough)
                 textView.setText(lowest == 0 ? ">" : "^");
+            else if(event.values[Z_AXIS] > 9.0f)
+                textView.setText(".");
         }
     }
 
