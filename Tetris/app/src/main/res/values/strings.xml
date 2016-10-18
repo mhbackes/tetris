@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Tetris</string>
+
+    <string name="tetris_content">TETRIS</string>
+</resources>
