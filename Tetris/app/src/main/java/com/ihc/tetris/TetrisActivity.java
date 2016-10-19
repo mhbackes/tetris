@@ -9,11 +9,15 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -105,7 +109,7 @@ public class TetrisActivity extends AppCompatActivity implements SensorEventList
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensorManager.registerListener(this,
                                         mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                                        SensorManager.SENSOR_DELAY_UI);
+                                        SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -141,39 +145,79 @@ public class TetrisActivity extends AppCompatActivity implements SensorEventList
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    private static int X_AXIS = 0, Y_AXIS = 1, Z_AXIS = 2;
+    private static final int X_AXIS = 0, Y_AXIS = 1, Z_AXIS = 2;
+    private static final int DOWN = 0, UP = 1, LEFT = 2, RIGHT = 3;
+    private int mOrientation;
+    private boolean mBack;
 
     public void onSensorChanged(SensorEvent event) {
         if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             TextView textView = (TextView) findViewById(R.id.fullscreen_content);
-
-
-            /* Sets text to:
-             *  - "<" if x axis is greater than 5.0f
-             *  - ">" if x axis is lower than -5.0f
-             *  - "v" if y axis is greater than 5.0f
-             *  - "^" if y axis is lower than -5.0f
-             * if more than one condition is true, sets text according to the highest absolute
-             * value. Sets text to "." only if none of the previous conditions are true and z axis
-             * is greater than 9.0f.
-            */
-            int highest = event.values[X_AXIS] > event.values[Y_AXIS] ? X_AXIS : Y_AXIS;
-            int lowest = event.values[X_AXIS] < event.values[Y_AXIS] ? X_AXIS : Y_AXIS;
-            boolean isHighEnough = event.values[highest] > 5.0f;
-            boolean isLowEnough = event.values[lowest] < -5.0f;
-            if(isHighEnough && isLowEnough) {
-                if(event.values[highest] > Math.abs(event.values[lowest]))
-                    textView.setText(highest == 0 ? "<" : "v");
-                else
-                    textView.setText(lowest == 0 ? ">" : "^");
+            boolean changed = false;
+            switch(mOrientation) {
+                case UP:
+                case DOWN:
+                    changed = changeOrientationY(event.values);
+                    break;
+                case LEFT:
+                case RIGHT:
+                    changed = changeOrientationX(event.values);
             }
-            else if(isHighEnough)
-                textView.setText(highest == 0 ? "<" : "v");
-            else if(isLowEnough)
-                textView.setText(lowest == 0 ? ">" : "^");
-            else if(event.values[Z_AXIS] > 9.0f)
+            if(!changed) {
+                if(mBack) {
+                    mBack = event.values[Z_AXIS] > 5.0f; // TODO send stop drop message
+                    if(!mBack)
+                        Log.d("Tetris", "STOP DROP");
+                } else {
+                    mBack = event.values[Z_AXIS] > 9.0f; // TODO send start drop message
+                    if(mBack)
+                        Log.d("Tetris", "START DROP");
+                }
+            }
+            if(mBack)
                 textView.setText(".");
+            else {
+                String arrows[] = {"v", "^", "<", ">"};
+                textView.setText(arrows[mOrientation]);
+            }
         }
+    }
+
+    boolean changeOrientationY(float axis[]) {
+        boolean isGrtrThanCurr = Math.abs(axis[X_AXIS]) > Math.abs(axis[Y_AXIS]) + 2.0f;
+        boolean isHighEnough = axis[X_AXIS] > 4.0f;
+        boolean isLowEnough = axis[X_AXIS] < -4.0f;
+        if(!isGrtrThanCurr)
+            return false;
+        if(isHighEnough) {
+            mOrientation = LEFT; // TODO send rotation message
+            Log.d("Tetris", "ORIENTATION LEFT");
+            return true;
+        }
+        if(isLowEnough) {
+            mOrientation = RIGHT; // TODO send rotation message
+            Log.d("Tetris", "ORIENTATION RIGHT");
+            return true;
+        }
+        return false;
+    }
+
+    boolean changeOrientationX(float axis[]) {
+        boolean isGrtrThanCurr = Math.abs(axis[Y_AXIS]) > Math.abs(axis[X_AXIS]) + 2.0f;
+        boolean isHighEnough = axis[Y_AXIS] > 4.0f;
+        boolean isLowEnough = axis[Y_AXIS] < -4.0f;
+        if(isGrtrThanCurr) {
+            if(isHighEnough) {
+                mOrientation = DOWN; // TODO send rotation message
+                Log.d("Tetris", "ORIENTATION DOWN");
+                return true;
+            } else if(isLowEnough) {
+                mOrientation = UP; // TODO send rotation message
+                Log.d("Tetris", "ORIENTATION UP");
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
