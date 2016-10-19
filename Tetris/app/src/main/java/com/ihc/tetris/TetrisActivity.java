@@ -49,7 +49,7 @@ public class TetrisActivity extends AppCompatActivity {
         }
     };
 
-    MotionControllerSimple mMotionController = null;
+    MotionController mMotionController = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
