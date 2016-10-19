@@ -53,11 +53,11 @@ public class MotionControllerSimple implements MotionController {
                 if(mDropDown) {
                     mDropDown = event.values[AXIS_Z] > 6.0f; // TODO send stop drop message
                     if(!mDropDown)
-                        Log.d("Tetris", "STOP DROP");
+                        Log.d("SimpleController", "STOP DROP");
                 } else {
                     mDropDown = event.values[AXIS_Z] > 9.0f; // TODO send start drop message
                     if(mDropDown)
-                        Log.d("Tetris", "START DROP");
+                        Log.d("SimpleController", "START DROP");
                 }
             }
             if(mDropDown)
@@ -77,12 +77,12 @@ public class MotionControllerSimple implements MotionController {
             return false;
         if(isHighEnough) {
             mOrientation = ORIENT_LEFT; // TODO send rotation message
-            Log.d("Tetris", "ORIENTATION LEFT");
+            Log.d("SimpleController", "ORIENTATION LEFT");
             return true;
         }
         if(isLowEnough) {
             mOrientation = ORIENT_RIGHT; // TODO send rotation message
-            Log.d("Tetris", "ORIENTATION RIGHT");
+            Log.d("SimpleController", "ORIENTATION RIGHT");
             return true;
         }
         return false;

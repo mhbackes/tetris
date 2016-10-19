@@ -59,13 +59,13 @@ public class MotionControllerPrecise implements MotionController {
             }
             if(!changed) {
                 if(mDropDown) {
-                    mDropDown = Math.abs(pitchAngle) < 35.0; // TODO send stop drop message
+                    mDropDown = Math.abs(pitchAngle) < 35.0 && Math.abs(rollAngle) < 35.0; // TODO send stop drop message
                     if(!mDropDown)
-                        Log.d("Tetris", "STOP DROP");
+                        Log.d("PreciseController", "STOP DROP");
                 } else {
-                    mDropDown = Math.abs(pitchAngle) < 25.0 && Math.abs(rollAngle) < 20.0 ; // TODO send start drop message
+                    mDropDown = Math.abs(pitchAngle) < 25.0 && Math.abs(rollAngle) < 25.0 ; // TODO send start drop message
                     if(mDropDown)
-                        Log.d("Tetris", "START DROP");
+                        Log.d("PreciseController", "START DROP");
                 }
             }
             if(mDropDown)
@@ -78,15 +78,15 @@ public class MotionControllerPrecise implements MotionController {
     }
 
     boolean changeOrientationY(double pitch, double roll) {
-        if(Math.abs(pitch) < 30) {
-            if (roll < -30.0) {
+        if(Math.abs(pitch) < 35.0) {
+            if (roll < -35.0) {
                 mOrientation = ORIENT_LEFT; // TODO send rotation message
-                Log.d("Tetris", "ORIENTATION LEFT");
+                Log.d("PreciseController", "ORIENTATION LEFT");
                 return true;
             }
-            if (roll > 30.0) {
+            if (roll > 35.0) {
                 mOrientation = ORIENT_RIGHT; // TODO send rotation message
-                Log.d("Tetris", "ORIENTATION RIGHT");
+                Log.d("PreciseController", "ORIENTATION RIGHT");
                 return true;
             }
         }
@@ -94,13 +94,13 @@ public class MotionControllerPrecise implements MotionController {
     }
 
     boolean changeOrientationX(double pitch) {
-        if(pitch < -60.0) {
+        if(pitch < -55.0) {
             mOrientation = ORIENT_DOWN; // TODO send rotation message
-            Log.d("Tetris", "ORIENTATION DOWN");
+            Log.d("PreciseController", "ORIENTATION DOWN");
             return true;
-        } else if(pitch > 60.0) {
+        } else if(pitch > 55.0) {
             mOrientation = ORIENT_UP; // TODO send rotation message
-            Log.d("Tetris", "ORIENTATION UP");
+            Log.d("PreciseController", "ORIENTATION UP");
             return true;
         }
         return false;
