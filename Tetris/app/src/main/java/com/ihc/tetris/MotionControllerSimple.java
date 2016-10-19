@@ -22,15 +22,15 @@ public class MotionControllerSimple implements MotionController {
                 SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    private static final int X_AXIS = 0, Y_AXIS = 1, Z_AXIS = 2;
-    private static final int DOWN = 0, UP = 1, LEFT = 2, RIGHT = 3;
     private int mOrientation;
     private boolean mDropDown;
 
+    @Override
     public int getOrientation() {
         return mOrientation;
     }
 
+    @Override
     public boolean isDropDown() {
         return mDropDown;
     }
@@ -41,21 +41,21 @@ public class MotionControllerSimple implements MotionController {
             TextView textView = (TextView) mActivity.findViewById(R.id.fullscreen_content);
             boolean changed = false;
             switch(mOrientation) {
-                case UP:
-                case DOWN:
+                case ORIENT_UP:
+                case ORIENT_DOWN:
                     changed = changeOrientationY(event.values);
                     break;
-                case LEFT:
-                case RIGHT:
+                case ORIENT_LEFT:
+                case ORIENT_RIGHT:
                     changed = changeOrientationX(event.values);
             }
             if(!changed) {
                 if(mDropDown) {
-                    mDropDown = event.values[Z_AXIS] > 6.0f; // TODO send stop drop message
+                    mDropDown = event.values[AXIS_Z] > 6.0f; // TODO send stop drop message
                     if(!mDropDown)
                         Log.d("Tetris", "STOP DROP");
                 } else {
-                    mDropDown = event.values[Z_AXIS] > 9.0f; // TODO send start drop message
+                    mDropDown = event.values[AXIS_Z] > 9.0f; // TODO send start drop message
                     if(mDropDown)
                         Log.d("Tetris", "START DROP");
                 }
@@ -70,18 +70,18 @@ public class MotionControllerSimple implements MotionController {
     }
 
     boolean changeOrientationY(float axis[]) {
-        boolean isGrtrThanCurr = Math.abs(axis[X_AXIS]) > Math.abs(axis[Y_AXIS]) + 3.0f;
-        boolean isHighEnough = axis[X_AXIS] > 4.0f;
-        boolean isLowEnough = axis[X_AXIS] < -4.0f;
+        boolean isGrtrThanCurr = Math.abs(axis[AXIS_X]) > Math.abs(axis[AXIS_Y]) + 3.0f;
+        boolean isHighEnough = axis[AXIS_X] > 4.0f;
+        boolean isLowEnough = axis[AXIS_X] < -4.0f;
         if(!isGrtrThanCurr)
             return false;
         if(isHighEnough) {
-            mOrientation = LEFT; // TODO send rotation message
+            mOrientation = ORIENT_LEFT; // TODO send rotation message
             Log.d("Tetris", "ORIENTATION LEFT");
             return true;
         }
         if(isLowEnough) {
-            mOrientation = RIGHT; // TODO send rotation message
+            mOrientation = ORIENT_RIGHT; // TODO send rotation message
             Log.d("Tetris", "ORIENTATION RIGHT");
             return true;
         }
@@ -89,16 +89,16 @@ public class MotionControllerSimple implements MotionController {
     }
 
     boolean changeOrientationX(float axis[]) {
-        boolean isGrtrThanCurr = Math.abs(axis[Y_AXIS]) > Math.abs(axis[X_AXIS]) + 3.0f;
-        boolean isHighEnough = axis[Y_AXIS] > 4.0f;
-        boolean isLowEnough = axis[Y_AXIS] < -4.0f;
+        boolean isGrtrThanCurr = Math.abs(axis[AXIS_Y]) > Math.abs(axis[AXIS_X]) + 3.0f;
+        boolean isHighEnough = axis[AXIS_Y] > 4.0f;
+        boolean isLowEnough = axis[AXIS_Y] < -4.0f;
         if(isGrtrThanCurr) {
             if(isHighEnough) {
-                mOrientation = DOWN; // TODO send rotation message
+                mOrientation = ORIENT_DOWN; // TODO send rotation message
                 Log.d("Tetris", "ORIENTATION DOWN");
                 return true;
             } else if(isLowEnough) {
-                mOrientation = UP; // TODO send rotation message
+                mOrientation = ORIENT_UP; // TODO send rotation message
                 Log.d("Tetris", "ORIENTATION UP");
                 return true;
             }

@@ -1,11 +1,18 @@
 package com.ihc.tetris;
 
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
+
+import java.util.List;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -59,7 +66,20 @@ public class TetrisActivity extends AppCompatActivity {
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
 
-        mMotionController = new MotionControllerSimple(this);
+        SensorManager manager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        if(!manager.getSensorList(Sensor.TYPE_ROTATION_VECTOR).isEmpty()) {
+            mMotionController = new MotionControllerPrecise(this);
+            Log.d("Tetris", "Using PRECISE controller.");
+        }
+        else if(!manager.getSensorList(Sensor.TYPE_ACCELEROMETER).isEmpty()) {
+            mMotionController = new MotionControllerSimple(this);
+            Log.d("Tetris", "Using SIMPLE controller.");
+        }
+        else {
+            TextView textView = (TextView) findViewById(R.id.fullscreen_content);
+            textView.setText("Incompatible\nDevice :(");
+            Log.d("Tetris", "Incompatible device.");
+        }
     }
 
     @Override
