@@ -23,7 +23,6 @@ public class TouchController implements View.OnTouchListener {
         switch(event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 return onActionDown(event);
-            case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_MOVE:
                 return onActionMove(event);
         }
@@ -31,14 +30,15 @@ public class TouchController implements View.OnTouchListener {
     }
 
     int mPrevX, mPrevY;
+    int mPrevDivDistance;
     int mDistance;
 
     public boolean onActionDown(MotionEvent e) {
-        mDistance = 0;
+        mPrevDivDistance = mDistance = 0;
         mPrevX = (int) e.getX();
         mPrevY = (int) e.getY();
         TextView textView = (TextView) mActivity.findViewById(R.id.fullscreen_content);
-        textView.setText(Integer.toString((int) mDistance));
+        textView.setText(Integer.toString(mDistance));
         return true;
     }
 
@@ -53,22 +53,24 @@ public class TouchController implements View.OnTouchListener {
         switch(orientation) {
             case MotionController.ORIENT_DOWN:
                 mDistance += dx;
-                Log.d("TouchController", "MOVE " + dx); //TODO send move message
                 break;
             case MotionController.ORIENT_UP:
                 mDistance -= dx;
-                Log.d("TouchController", "MOVE " + dx); //TODO send move message
                 break;
             case MotionController.ORIENT_LEFT:
                 mDistance += dy;
-                Log.d("TouchController", "MOVE " + dy); //TODO send move message
                 break;
             case MotionController.ORIENT_RIGHT:
                 mDistance -= dy;
-                Log.d("TouchController", "MOVE " + dy); //TODO send move message
         }
-        TextView textView = (TextView) mActivity.findViewById(R.id.fullscreen_content);
-        textView.setText(Integer.toString((int) mDistance));
+        int divDistance = mDistance / 100;
+        int dDistance = divDistance - mPrevDivDistance;
+        if(Math.abs(dDistance) >= 1 && Math.abs(divDistance) <= 9) {
+            mPrevDivDistance = divDistance;
+            Log.d("TouchController", "MOVE " + dDistance); //TODO send move message
+            TextView textView = (TextView) mActivity.findViewById(R.id.fullscreen_content);
+            textView.setText(Integer.toString(divDistance));
+        }
         return true;
     }
 }
