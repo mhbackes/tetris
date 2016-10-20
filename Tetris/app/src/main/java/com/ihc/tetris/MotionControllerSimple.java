@@ -49,22 +49,26 @@ public class MotionControllerSimple implements MotionController {
                 case ORIENT_RIGHT:
                     changed = changeOrientationX(event.values);
             }
-            if(!changed) {
+            if(mDropDown) {
+                mDropDown = event.values[AXIS_Z] > 6.0f; // TODO send stop drop message
+                if(!mDropDown) {
+                    Log.d("SimpleController", "STOP DROP");
+                    changed = true;
+                }
+            } else {
+                mDropDown = event.values[AXIS_Z] > 9.0f; // TODO send start drop message
                 if(mDropDown) {
-                    mDropDown = event.values[AXIS_Z] > 6.0f; // TODO send stop drop message
-                    if(!mDropDown)
-                        Log.d("SimpleController", "STOP DROP");
-                } else {
-                    mDropDown = event.values[AXIS_Z] > 9.0f; // TODO send start drop message
-                    if(mDropDown)
-                        Log.d("SimpleController", "START DROP");
+                    Log.d("SimpleController", "START DROP");
+                    changed = true;
                 }
             }
-            if(mDropDown)
-                textView.setText(".");
-            else {
-                String arrows[] = {"v", "^", "<", ">"};
-                textView.setText(arrows[mOrientation]);
+            if(changed) {
+                if (mDropDown)
+                    textView.setText(".");
+                else {
+                    String arrows[] = {"v", "^", "<", ">"};
+                    textView.setText(arrows[mOrientation]);
+                }
             }
         }
     }

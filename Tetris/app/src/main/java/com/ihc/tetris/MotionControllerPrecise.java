@@ -57,22 +57,26 @@ public class MotionControllerPrecise implements MotionController {
                 case ORIENT_RIGHT:
                     changed = changeOrientationX(pitchAngle);
             }
-            if(!changed) {
+            if(mDropDown) {
+                mDropDown = Math.abs(pitchAngle) < 35.0 && Math.abs(rollAngle) < 35.0; // TODO send stop drop message
+                if(!mDropDown) {
+                    Log.d("PreciseController", "STOP DROP");
+                    changed = true;
+                }
+            } else {
+                mDropDown = Math.abs(pitchAngle) < 25.0 && Math.abs(rollAngle) < 25.0 ; // TODO send start drop message
                 if(mDropDown) {
-                    mDropDown = Math.abs(pitchAngle) < 35.0 && Math.abs(rollAngle) < 35.0; // TODO send stop drop message
-                    if(!mDropDown)
-                        Log.d("PreciseController", "STOP DROP");
-                } else {
-                    mDropDown = Math.abs(pitchAngle) < 25.0 && Math.abs(rollAngle) < 25.0 ; // TODO send start drop message
-                    if(mDropDown)
-                        Log.d("PreciseController", "START DROP");
+                    Log.d("PreciseController", "START DROP");
+                    changed = true;
                 }
             }
-            if(mDropDown)
-                textView.setText(".");
-            else {
-                String arrows[] = {"v", "^", "<", ">"};
-                textView.setText(arrows[mOrientation]);
+            if(changed) {
+                if (mDropDown)
+                    textView.setText(".");
+                else {
+                    String arrows[] = {"v", "^", "<", ">"};
+                    textView.setText(arrows[mOrientation]);
+                }
             }
         }
     }

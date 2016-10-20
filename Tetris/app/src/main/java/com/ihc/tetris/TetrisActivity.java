@@ -66,20 +66,24 @@ public class TetrisActivity extends AppCompatActivity {
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
 
+
         SensorManager manager = (SensorManager) getSystemService(SENSOR_SERVICE);
         if(!manager.getSensorList(Sensor.TYPE_ROTATION_VECTOR).isEmpty()) {
             mMotionController = new MotionControllerPrecise(this);
-            Log.d("Tetris", "Using PRECISE controller.");
+            Log.d("Tetris", "Using PRECISE motion controller.");
+            mContentView.setOnTouchListener(new TouchController(this, mMotionController));
         }
         else if(!manager.getSensorList(Sensor.TYPE_ACCELEROMETER).isEmpty()) {
             mMotionController = new MotionControllerSimple(this);
-            Log.d("Tetris", "Using SIMPLE controller.");
+            Log.d("Tetris", "Using SIMPLE motion controller.");
+            mContentView.setOnTouchListener(new TouchController(this, mMotionController));
         }
         else {
             TextView textView = (TextView) findViewById(R.id.fullscreen_content);
             textView.setText("Incompatible\nDevice :(");
             Log.d("Tetris", "Incompatible device.");
         }
+
     }
 
     @Override
