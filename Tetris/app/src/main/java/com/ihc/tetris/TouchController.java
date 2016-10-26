@@ -1,5 +1,6 @@
 package com.ihc.tetris;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -48,6 +49,7 @@ public class TouchController implements View.OnTouchListener {
         return true;
     }
 
+    @SuppressLint("SetTextI18n")
     public boolean onActionMove(MotionEvent e) {
         int x = (int) e.getX();
         int y = (int) e.getY();
@@ -73,10 +75,20 @@ public class TouchController implements View.OnTouchListener {
         int dDistance = divDistance - mPrevDivDistance;
         if(Math.abs(dDistance) >= 1 && Math.abs(divDistance) <= 9) {
             mPrevDivDistance = divDistance;
-            Log.d("TouchController", "MOVE " + dDistance); //TODO send move message
+            Log.d("TouchController", "MOVE " + dDistance);
+            sendMoveMessage(dDistance);
             TextView textView = (TextView) mActivity.findViewById(R.id.fullscreen_content);
             textView.setText(Integer.toString(divDistance));
         }
         return true;
+    }
+
+    void sendMoveMessage(int distance) {
+        int posDist = distance;
+        int negDist = distance;
+        while(posDist-- > 0)
+            mBluetoothService.sendMessage(MOVE_RIGHT);
+        while(negDist++ < 0)
+            mBluetoothService.sendMessage(MOVE_LEFT);
     }
 }
