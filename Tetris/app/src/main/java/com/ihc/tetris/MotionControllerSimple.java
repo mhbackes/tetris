@@ -10,31 +10,12 @@ import android.widget.TextView;
 /**
  * Created by mhbackes on 19/10/16.
  */
-public class MotionControllerSimple implements MotionController {
-    private SensorManager mSensorManager = null;
-    private Activity mActivity = null;
-    private BluetoothService mBluetoothService = null;
-
+public class MotionControllerSimple extends MotionController {
     MotionControllerSimple(Activity activity, BluetoothService bluetoothService) {
-        mActivity = activity;
-        mSensorManager = (SensorManager) mActivity.getSystemService(mActivity.SENSOR_SERVICE);
+        super(activity, bluetoothService);
         mSensorManager.registerListener(this,
                 mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL);
-        mBluetoothService = bluetoothService;
-    }
-
-    private int mOrientation;
-    private boolean mDropDown;
-
-    @Override
-    public int getOrientation() {
-        return mOrientation;
-    }
-
-    @Override
-    public boolean isDropDown() {
-        return mDropDown;
     }
 
     @Override
@@ -55,12 +36,14 @@ public class MotionControllerSimple implements MotionController {
                 mDropDown = event.values[AXIS_Z] > 6.0f; // TODO send stop drop message
                 if(!mDropDown) {
                     Log.d("SimpleController", "STOP DROP");
+                    mBluetoothService.sendMessage(STOP_DROP);
                     changed = true;
                 }
             } else {
                 mDropDown = event.values[AXIS_Z] > 9.0f; // TODO send start drop message
                 if(mDropDown) {
                     Log.d("SimpleController", "START DROP");
+                    mBluetoothService.sendMessage(START_DROP);
                     changed = true;
                 }
             }
@@ -82,13 +65,13 @@ public class MotionControllerSimple implements MotionController {
         if(!isGrtrThanCurr)
             return false;
         if(isHighEnough) {
-            mOrientation = ORIENT_LEFT; // TODO send rotation message
             Log.d("SimpleController", "ORIENTATION LEFT");
+            setOrientation(ORIENT_LEFT);
             return true;
         }
         if(isLowEnough) {
-            mOrientation = ORIENT_RIGHT; // TODO send rotation message
             Log.d("SimpleController", "ORIENTATION RIGHT");
+            setOrientation(ORIENT_RIGHT);
             return true;
         }
         return false;
@@ -100,12 +83,12 @@ public class MotionControllerSimple implements MotionController {
         boolean isLowEnough = axis[AXIS_Y] < -4.0f;
         if(isGrtrThanCurr) {
             if(isHighEnough) {
-                mOrientation = ORIENT_DOWN; // TODO send rotation message
                 Log.d("Tetris", "ORIENTATION DOWN");
+                setOrientation(ORIENT_DOWN);
                 return true;
             } else if(isLowEnough) {
-                mOrientation = ORIENT_UP; // TODO send rotation message
                 Log.d("Tetris", "ORIENTATION UP");
+                setOrientation(ORIENT_UP);
                 return true;
             }
         }

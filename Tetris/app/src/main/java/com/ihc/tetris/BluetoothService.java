@@ -157,6 +157,24 @@ public class BluetoothService {
     }
 
     /**
+     * Sends a message.
+     *
+     * @param message A string of text to send.
+     */
+    public void sendMessage(String message) {
+        // Check that there's actually something to send
+        if (message.length() > 0) {
+            // Get the message bytes and tell the BluetoothChatService to write
+            byte[] send = (message + '\n').getBytes();
+            write(send);
+        }
+    }
+
+    public void sendMessage(int message) {
+        sendMessage(Integer.toString(message));
+    }
+
+    /**
      * Write to the ConnectedThread in an unsynchronized manner
      * @param out The bytes to write
      * @see ConnectedThread#write(byte[])

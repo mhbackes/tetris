@@ -10,31 +10,14 @@ import android.widget.TextView;
 /**
  * Created by mhbackes on 19/10/16.
  */
-public class MotionControllerPrecise implements MotionController {
-    private SensorManager mSensorManager = null;
-    private Activity mActivity = null;
-    private BluetoothService mBluetoothService = null;
+public class MotionControllerPrecise extends MotionController {
+    public static final String TAG = "MotionConrollerPrecise";
 
     MotionControllerPrecise(Activity activity, BluetoothService bluetoothService) {
-        mActivity = activity;
-        mSensorManager = (SensorManager) mActivity.getSystemService(mActivity.SENSOR_SERVICE);
+        super(activity, bluetoothService);
         mSensorManager.registerListener(this,
                 mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
                 SensorManager.SENSOR_DELAY_GAME);
-        mBluetoothService = bluetoothService;
-    }
-
-    private int mOrientation;
-    private boolean mDropDown;
-
-    @Override
-    public int getOrientation() {
-        return mOrientation;
-    }
-
-    @Override
-    public boolean isDropDown() {
-        return mDropDown;
     }
 
     float mR[] = new float[9];
@@ -60,15 +43,17 @@ public class MotionControllerPrecise implements MotionController {
                     changed = changeOrientationX(pitchAngle);
             }
             if(mDropDown) {
-                mDropDown = Math.abs(pitchAngle) < 35.0 && Math.abs(rollAngle) < 35.0; // TODO send stop drop message
+                mDropDown = Math.abs(pitchAngle) < 35.0 && Math.abs(rollAngle) < 35.0;
                 if(!mDropDown) {
                     Log.d("PreciseController", "STOP DROP");
+                    mBluetoothService.sendMessage(STOP_DROP);
                     changed = true;
                 }
             } else {
-                mDropDown = Math.abs(pitchAngle) < 25.0 && Math.abs(rollAngle) < 25.0 ; // TODO send start drop message
+                mDropDown = Math.abs(pitchAngle) < 25.0 && Math.abs(rollAngle) < 25.0 ;
                 if(mDropDown) {
                     Log.d("PreciseController", "START DROP");
+                    mBluetoothService.sendMessage(START_DROP);
                     changed = true;
                 }
             }
@@ -76,7 +61,7 @@ public class MotionControllerPrecise implements MotionController {
                 if (mDropDown)
                     textView.setText(".");
                 else {
-                    String arrows[] = {"v", "^", "<", ">"};
+                    String arrows[] = {"v", "^", "<", ">", "*"};
                     textView.setText(arrows[mOrientation]);
                 }
             }
@@ -86,12 +71,12 @@ public class MotionControllerPrecise implements MotionController {
     boolean changeOrientationY(double pitch, double roll) {
         if(Math.abs(pitch) < 35.0) {
             if (roll < -35.0) {
-                mOrientation = ORIENT_LEFT; // TODO send rotation message
+                setOrientation(ORIENT_LEFT);
                 Log.d("PreciseController", "ORIENTATION LEFT");
                 return true;
             }
             if (roll > 35.0) {
-                mOrientation = ORIENT_RIGHT; // TODO send rotation message
+                setOrientation(ORIENT_RIGHT);
                 Log.d("PreciseController", "ORIENTATION RIGHT");
                 return true;
             }
@@ -101,19 +86,14 @@ public class MotionControllerPrecise implements MotionController {
 
     boolean changeOrientationX(double pitch) {
         if(pitch < -55.0) {
-            mOrientation = ORIENT_DOWN; // TODO send rotation message
+            setOrientation(ORIENT_DOWN);
             Log.d("PreciseController", "ORIENTATION DOWN");
             return true;
         } else if(pitch > 55.0) {
-            mOrientation = ORIENT_UP; // TODO send rotation message
+            setOrientation(ORIENT_UP);
             Log.d("PreciseController", "ORIENTATION UP");
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
     }
 }
