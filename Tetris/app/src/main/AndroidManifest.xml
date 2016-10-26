@@ -5,7 +5,9 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
+
     <application
+        android:exported="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -14,7 +16,7 @@
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_main"
+            android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/FullscreenTheme">
             <intent-filter>
@@ -30,7 +32,7 @@
             android:theme="@style/FullscreenTheme"/>
         <activity
             android:name=".DeviceListActivity"
-            android:label="Select a device to connect:"
+            android:label="@string/select_device"
             android:theme="@android:style/Theme.DeviceDefault.Dialog.NoActionBar"
             android:configChanges="orientation|keyboardHidden"/>
     </application>
