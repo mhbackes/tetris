@@ -52,7 +52,9 @@ public class TetrisActivity extends AppCompatActivity {
         }
     };
 
+    BluetoothService mBluetoothService = null;
     MotionController mMotionController = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,17 +64,21 @@ public class TetrisActivity extends AppCompatActivity {
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
 
+        mBluetoothService = BluetoothService.getInstance();
+
 
         SensorManager manager = (SensorManager) getSystemService(SENSOR_SERVICE);
         if(!manager.getSensorList(Sensor.TYPE_ROTATION_VECTOR).isEmpty()) {
-            mMotionController = new MotionControllerPrecise(this);
+            mMotionController = new MotionControllerPrecise(this, mBluetoothService);
             Log.d("Tetris", "Using PRECISE motion controller.");
-            mContentView.setOnTouchListener(new TouchController(this, mMotionController));
+            mContentView.setOnTouchListener(
+                    new TouchController(this,mMotionController, mBluetoothService));
         }
         else if(!manager.getSensorList(Sensor.TYPE_ACCELEROMETER).isEmpty()) {
-            mMotionController = new MotionControllerSimple(this);
+            mMotionController = new MotionControllerSimple(this, mBluetoothService);
             Log.d("Tetris", "Using SIMPLE motion controller.");
-            mContentView.setOnTouchListener(new TouchController(this, mMotionController));
+            mContentView.setOnTouchListener(
+                    new TouchController(this, mMotionController, mBluetoothService));
         }
         else {
             TextView textView = (TextView) findViewById(R.id.fullscreen_content);

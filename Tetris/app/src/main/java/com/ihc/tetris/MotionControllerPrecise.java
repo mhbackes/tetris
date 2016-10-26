@@ -13,13 +13,15 @@ import android.widget.TextView;
 public class MotionControllerPrecise implements MotionController {
     private SensorManager mSensorManager = null;
     private Activity mActivity = null;
+    private BluetoothService mBluetoothService = null;
 
-    MotionControllerPrecise(Activity activity) {
+    MotionControllerPrecise(Activity activity, BluetoothService bluetoothService) {
         mActivity = activity;
         mSensorManager = (SensorManager) mActivity.getSystemService(mActivity.SENSOR_SERVICE);
         mSensorManager.registerListener(this,
                 mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
                 SensorManager.SENSOR_DELAY_GAME);
+        mBluetoothService = bluetoothService;
     }
 
     private int mOrientation;

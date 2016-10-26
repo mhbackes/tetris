@@ -13,13 +13,15 @@ import android.widget.TextView;
 public class MotionControllerSimple implements MotionController {
     private SensorManager mSensorManager = null;
     private Activity mActivity = null;
+    private BluetoothService mBluetoothService = null;
 
-    MotionControllerSimple(Activity activity) {
+    MotionControllerSimple(Activity activity, BluetoothService bluetoothService) {
         mActivity = activity;
         mSensorManager = (SensorManager) mActivity.getSystemService(mActivity.SENSOR_SERVICE);
         mSensorManager.registerListener(this,
                 mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL);
+        mBluetoothService = bluetoothService;
     }
 
     private int mOrientation;

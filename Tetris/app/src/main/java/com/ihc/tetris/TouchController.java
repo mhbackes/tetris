@@ -10,12 +10,18 @@ import android.widget.TextView;
  * Created by mhbackes on 20/10/16.
  */
 public class TouchController implements View.OnTouchListener {
-    MotionController mMotionController = null;
-    private Activity mActivity = null;
+    public static final int MOVE_LEFT = 4, MOVE_RIGHT = 5;
 
-    TouchController(Activity activity, MotionController motionController) {
+    private MotionController mMotionController = null;
+    private Activity mActivity = null;
+    private BluetoothService mBluetoothService = null;
+
+
+    TouchController(Activity activity, MotionController motionController,
+                    BluetoothService bluetoothService) {
         mActivity = activity;
         mMotionController = motionController;
+        mBluetoothService = bluetoothService;
     }
 
     @Override
