@@ -1,9 +1,9 @@
 package com.ihc.tetris;
 
 import android.annotation.SuppressLint;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,14 +11,16 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-
-import java.util.List;
+import android.widget.Toast;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
 public class TetrisActivity extends AppCompatActivity {
+    // Debugging
+    public static final String TAG = "TetrisActivity";
+
     /**
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
@@ -54,6 +56,7 @@ public class TetrisActivity extends AppCompatActivity {
 
     BluetoothService mBluetoothService = null;
     MotionController mMotionController = null;
+    SensorManager mSensorManager = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,27 +68,52 @@ public class TetrisActivity extends AppCompatActivity {
         mContentView = findViewById(R.id.fullscreen_content);
 
         mBluetoothService = BluetoothService.getInstance();
+        mBluetoothService.setHandler(mHandler);
 
-
-        SensorManager manager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        if(!manager.getSensorList(Sensor.TYPE_ROTATION_VECTOR).isEmpty()) {
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        if(!mSensorManager.getSensorList(Sensor.TYPE_ROTATION_VECTOR).isEmpty()) {
             mMotionController = new MotionControllerPrecise(this, mBluetoothService);
-            Log.d("Tetris", "Using PRECISE motion controller.");
+            Log.d(TAG, "Using PRECISE motion controller.");
             mContentView.setOnTouchListener(
                     new TouchController(this,mMotionController, mBluetoothService));
         }
-        else if(!manager.getSensorList(Sensor.TYPE_ACCELEROMETER).isEmpty()) {
+        else if(!mSensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).isEmpty()) {
             mMotionController = new MotionControllerSimple(this, mBluetoothService);
-            Log.d("Tetris", "Using SIMPLE motion controller.");
+            Log.d(TAG, "Using SIMPLE motion controller.");
             mContentView.setOnTouchListener(
                     new TouchController(this, mMotionController, mBluetoothService));
         }
         else {
-            TextView textView = (TextView) findViewById(R.id.fullscreen_content);
+            TextView textView = (TextView) mContentView;
             textView.setText("Incompatible\nDevice :(");
-            Log.d("Tetris", "Incompatible device.");
+            Log.d(TAG, "Incompatible device.");
         }
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(mMotionController != null) {
+            mMotionController.stop();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(mMotionController != null) {
+            mMotionController.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mMotionController != null) {
+            mMotionController.stop();
+        }
+        mBluetoothService.stop();
     }
 
     @Override
@@ -113,4 +141,30 @@ public class TetrisActivity extends AppCompatActivity {
         if (hasFocus)
             hide();
     }
+
+    /**
+     * The Handler that gets information back from the BluetoothChatService
+     */
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case Constants.MESSAGE_STATE_CHANGE:
+                    if(msg.arg1 == BluetoothService.STATE_NONE
+                            || msg.arg1 == BluetoothService.STATE_LISTEN)
+                        finish();
+                    break;
+                case Constants.MESSAGE_READ:
+                    byte[] readBuf = (byte[]) msg.obj;
+                    // construct a string from the valid bytes in the buffer
+                    String readMessage = new String(readBuf, 0, msg.arg1);
+                    // TODO read message
+                    break;
+                case Constants.MESSAGE_TOAST:
+                    Toast.makeText(TetrisActivity.this, msg.getData().getString(Constants.TOAST),
+                            Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
 }

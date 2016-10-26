@@ -24,11 +24,13 @@ public abstract class MotionController implements SensorEventListener {
     MotionController(Activity activity, BluetoothService bluetoothService) {
         mActivity = activity;
         mSensorManager = (SensorManager) mActivity.getSystemService(mActivity.SENSOR_SERVICE);
-        mSensorManager.registerListener(this,
-                mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
-                SensorManager.SENSOR_DELAY_GAME);
         mBluetoothService = bluetoothService;
+        start();
     }
+
+    public abstract void start();
+
+    public abstract void stop();
 
     public int getOrientation() {
         return mOrientation;

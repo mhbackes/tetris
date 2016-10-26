@@ -13,9 +13,16 @@ import android.widget.TextView;
 public class MotionControllerSimple extends MotionController {
     MotionControllerSimple(Activity activity, BluetoothService bluetoothService) {
         super(activity, bluetoothService);
+    }
+
+    public void start() {
         mSensorManager.registerListener(this,
                 mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    public void stop() {
+        mSensorManager.unregisterListener(this);
     }
 
     @Override

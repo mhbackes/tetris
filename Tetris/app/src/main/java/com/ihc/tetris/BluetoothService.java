@@ -47,12 +47,8 @@ public class BluetoothService {
 
     // Constants that indicate command to computer
     public static final int EXIT_CMD = -1;
-    public static final int VOL_UP = 1;
-    public static final int VOL_DOWN = 2;
-    public static final int MOUSE_MOVE = 3;
 
-
-    public static BluetoothService getInstance() { return mBluetoothService; };
+    public static BluetoothService getInstance() { return mBluetoothService; }
 
     /**
      * Constructor. Prepares a new BluetoothChat session.
@@ -225,7 +221,7 @@ public class BluetoothService {
         // Send a failure message back to the Activity
         Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
-        bundle.putString(Constants.TOAST, "Device connection was lost");
+        bundle.putString(Constants.TOAST, "Disconnected.");
         msg.setData(bundle);
         mHandler.sendMessage(msg);
 

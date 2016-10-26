@@ -15,9 +15,15 @@ public class MotionControllerPrecise extends MotionController {
 
     MotionControllerPrecise(Activity activity, BluetoothService bluetoothService) {
         super(activity, bluetoothService);
+    }
+    public void start() {
         mSensorManager.registerListener(this,
                 mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
                 SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    public void stop() {
+        mSensorManager.unregisterListener(this);
     }
 
     float mR[] = new float[9];

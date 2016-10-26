@@ -191,10 +191,11 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case Constants.MESSAGE_STATE_CHANGE:
-                    Toast.makeText(MainActivity.this, BluetoothService.STATE[msg.arg1],
-                            Toast.LENGTH_SHORT).show();
-                    if(msg.arg1 == BluetoothService.STATE_CONNECTED)
+                    if(msg.arg1 == BluetoothService.STATE_CONNECTED) {
+                        Toast.makeText(MainActivity.this, BluetoothService.STATE[msg.arg1],
+                                Toast.LENGTH_SHORT).show();
                         startTetris();
+                    }
                     break;
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
@@ -233,6 +234,8 @@ public class MainActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                     finish();
                 }
+            case START_TETRIS:
+                mBluetoothService.setHandler(mHandler);
         }
     }
 
