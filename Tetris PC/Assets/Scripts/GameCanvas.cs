@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using System.Collections;
 
 public class GameCanvas : MonoBehaviour {
 
-    public void MainMenu()
+    public Text textScore;
+
+    public void setText(string text)
     {
-        SceneManager.LoadScene("Menu");
+        textScore.text = text;
     }
 }

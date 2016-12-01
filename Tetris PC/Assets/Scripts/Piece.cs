@@ -13,6 +13,10 @@ public class Piece : MonoBehaviour {
     public float naturalFallSpeed_begin;
     public bool isDropped;
 
+    public bool isActive = false;
+
+    public float currentFallSpeedCycle;
+
     void Awake()
     {
         actionRef = gameObject.GetComponent<Action>();
@@ -22,16 +26,31 @@ public class Piece : MonoBehaviour {
     void Start()
     {
         naturalFallSpeed_begin = naturalFallSpeed;
+        currentFallSpeedCycle = naturalFallSpeed_begin;
         isDropped = false;
 
         actionRef.checkEndGamePiece();
     }
+
+    public void activate()
+    {
+        isActive = true;
+    }
 	
 	void Update () {
+
+        if (!isActive)
+        {
+            return;
+        }
 
         if (InputManager.Fall())
         {
             doFall();
+        }
+        else if(InputManager.StopFall())
+        {
+            stopFall();
         }
 
         naturalFallSpeed -= Time.deltaTime;
@@ -45,7 +64,7 @@ public class Piece : MonoBehaviour {
                 pieceSpawnerRef.spawn();
                 enabled = false;
             }
-            naturalFallSpeed = naturalFallSpeed_begin;
+            naturalFallSpeed = currentFallSpeedCycle;
         }
 
         if(InputManager.M_Horizontal_L())
@@ -73,12 +92,17 @@ public class Piece : MonoBehaviour {
 
     public void doFall()
     {
-        if(!isDropped)
-        {
-            naturalFallSpeed = 0f;
-            naturalFallSpeed_begin = directFallSpeed;
+        naturalFallSpeed = 0f;
+        currentFallSpeedCycle = directFallSpeed;
 
-            isDropped = true;
-        }
+        isDropped = true;
+    }
+
+    public void stopFall()
+    {
+        naturalFallSpeed = 0f;
+        currentFallSpeedCycle = naturalFallSpeed_begin;
+
+        isDropped = false;
     }
 }

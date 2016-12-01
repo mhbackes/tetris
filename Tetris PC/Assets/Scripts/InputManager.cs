@@ -81,6 +81,18 @@ public static class InputManager {
         return keyboard || bluetooth;
     }
 
+    public static bool StopFall()
+    {
+        bool keyboard;
+        bool bluetooth;
+
+        keyboard = Input.GetButtonUp("Fall");
+
+        bluetooth = checkBluetooth(ACTION.STOP_DROP);
+
+        return keyboard || bluetooth;
+    }
+
     private static bool checkBluetooth(ACTION newAction)
     {
         if (action == newAction)
@@ -90,6 +102,13 @@ public static class InputManager {
         }
 
         return false;
+    }
+
+    public static void Reset()
+    {
+        action = ACTION.NONE;
+
+        Debug.Log("Input Manager reseted");
     }
 
     public static void Parse(string text)

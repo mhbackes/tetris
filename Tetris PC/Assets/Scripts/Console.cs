@@ -2,14 +2,13 @@
 using UnityEngine.UI;
 using System.Collections;
 
-[RequireComponent(typeof(Bluetooth))]
 public class Console : MonoBehaviour {
 
     public Text portText;
     public Text buttonText;
     public Text notificationText;
 
-    private Bluetooth bluetoothRef;
+    public Bluetooth bluetoothRef;
 
     private enum STATUS
     {
@@ -21,8 +20,6 @@ public class Console : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
-        bluetoothRef = gameObject.GetComponent<Bluetooth>();
 
         status = STATUS.notRunning;
     }

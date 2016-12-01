@@ -8,5 +8,4 @@ public class DontDestroyOnLoad : MonoBehaviour {
         DontDestroyOnLoad(this);
     }
 
-
 }

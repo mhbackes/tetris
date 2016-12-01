@@ -16,11 +16,20 @@ public class Grid : MonoBehaviour {
     private GameCanvas gameCanvas;
     private GameManager gameManager;
 
+    private bool callOnce = false;
+
+    private bool playingAnimation = false;
+
     void Start()
     {
         grid = new GameObject[width, height];
         gameCanvas = GameObject.Find("GameCanvas").GetComponent<GameCanvas>();
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+    }
+
+    public bool isPlayingAnimation()
+    {
+        return playingAnimation;
     }
 
     bool getGridValue(Vector2 position)
@@ -116,6 +125,7 @@ public class Grid : MonoBehaviour {
                 {
                     eraseLine(i);
                     moveGridDown(i);
+                    gameManager.addScore(GameManager.SCORE_TYPE.fill);
                     reCheck = true;
                 }
             }
@@ -161,18 +171,36 @@ public class Grid : MonoBehaviour {
         return false;
     }
 
+    public void endGame()
+    {
+        StartCoroutine(endGameAnimation());
+    }
+
     IEnumerator endGameAnimation()
     {
-        for (int i = 0; i < height; i++)
+        if(!callOnce)
         {
-            for (int j = 0; j < width; j++)
-            {
-                grid[j, i] = (GameObject) Instantiate(wallPrefab, new Vector3(j, i, 0f), Quaternion.identity);
-                yield return new WaitForSeconds(0.0025f * Time.timeScale);
-            }
-        }
+            gameManager.stopCouting();
 
-        gameCanvas.MainMenu();
+            playingAnimation = true;
+
+            callOnce = true;
+
+            Debug.Log("endGame animation called");
+
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    grid[j, i] = (GameObject)Instantiate(wallPrefab, new Vector3(j, i, 0f), Quaternion.identity);
+                    yield return new WaitForSeconds(0.0025f * Time.timeScale);
+                }
+            }
+
+            yield return new WaitForEndOfFrame();
+
+            gameManager.informEndGame();
+        }
     }
 
     void printGrid()
